@@ -10,15 +10,20 @@ import ARKit
 import RealityKit
 
 
+/// The ARDataModel facilitates between the ARSession and related ARView and the ContentView
+///
+/// - Saving  ARWorldmaps and restoring ARWorldmaps
+/// - Setup the ARConfiguration
+/// - Create the virtual Sphere objects
+/// - Add/Remove the virtual entities
+///
 class ARDataModel:ObservableObject {
+    @AppStorage("shouldRloadWorldmap") var shouldReloadWorldmap:Bool=false
     
    @Published var arView:TrackedARView!
    @Published var enableAR:Bool=true
    @Published var snapshotImage:UIImage?=nil
    @Published var canSaveWorldMap:Bool = false
-   
-    //Force loading virtual objects from ARWorldMap after app restart
-    var shouldReloadVirtualObjects:Bool=false
     
     private var wrappedSnapshotImage:UIImage?=nil{
         didSet {
@@ -83,30 +88,6 @@ class ARDataModel:ObservableObject {
         }
     }
     
-    func loadARExperience(url:URL){
-        
-        self.wrappedSnapshotImage = nil
-        
-        if let worldMapURL = worldMapURL, let worldMap = getWorldMap(url: worldMapURL){
-            if let snapshotAnchor = worldMap.anchors.compactMap({ $0 as? ARSnapshotAnchor
-            }).first {
-                self.wrappedSnapshotImage = UIImage(data: snapshotAnchor.snaphotImageData)
-            } else {
-                print("No snapshot available for this Experience")
-            }
-            
-            worldMap.anchors.removeAll { $0 is ARSnapshotAnchor}
-            
-        
-            setupARConfiguration(using: worldMap)
-            
-            //Reload ARAnchors from WorldMap
-            anchorsFor(worldMap)
-            
-        }
-    }
-    
-    
     func sphereEntity(forAnchor anchor:ARAnchor, in view:ARView) -> Entity {
         let newAnchorEntity = AnchorEntity.init(anchor: anchor)
         
@@ -141,6 +122,34 @@ class ARDataModel:ObservableObject {
         }
     }
     
+    
+}
+
+extension ARDataModel {
+    
+    func loadARExperience(url:URL){
+        
+        self.wrappedSnapshotImage = nil
+        
+        if let worldMapURL = worldMapURL, let worldMap = getWorldMap(url: worldMapURL){
+            if let snapshotAnchor = worldMap.anchors.compactMap({ $0 as? ARSnapshotAnchor
+            }).first {
+                self.wrappedSnapshotImage = UIImage(data: snapshotAnchor.snaphotImageData)
+            } else {
+                print("No snapshot available for this Experience")
+            }
+            
+            worldMap.anchors.removeAll { $0 is ARSnapshotAnchor}
+            
+        
+            setupARConfiguration(using: worldMap)
+            
+            //Reload ARAnchors from WorldMap
+            anchorsFor(worldMap)
+            
+        }
+    }
+    
     func saveARExperience(withURL url:URL){
         guard let arView = self.arView else {return}
         
@@ -169,4 +178,9 @@ class ARDataModel:ObservableObject {
             }
         }
     }
+    
+    
+    
+    
+    
 }

@@ -12,6 +12,8 @@ import ARKit
 
 struct ContentView: View {
     @EnvironmentObject var dataModel:ARDataModel
+    @State private var isReloadOnOrientationChange:Bool=false
+    @State private var lastKnownOrientation:UIDeviceOrientation = .unknown
     
     var body: some View {
         
@@ -68,11 +70,31 @@ struct ContentView: View {
            }
             
         }
+        .onAppear(perform: {
+            self.isReloadOnOrientationChange = self.dataModel.shouldReloadWorldmap
+        })
         .navigationViewStyle(.stack)
         .onOrientationChange { orientation in
-            if let worldMapURL = dataModel.worldMapURL {
-                dataModel.loadARExperience(url: worldMapURL)
+           
+            defer {
+                lastKnownOrientation = orientation
             }
+            
+            guard orientation != lastKnownOrientation else {
+                return
+            }
+            
+            print("Changed orientation")
+            if isReloadOnOrientationChange {
+                if let worldMapURL = dataModel.worldMapURL {
+                    dataModel.loadARExperience(url: worldMapURL)
+                }
+            }
+            
+            
+            self.isReloadOnOrientationChange=true
+            
+            
         }
     }
 }
