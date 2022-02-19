@@ -66,6 +66,10 @@ struct ContentView: View {
                     if let worldMapURL = dataModel.worldMapURL {
                         dataModel.saveARExperience(withURL: worldMapURL)
                     }
+                }, goToARSettings:{
+                 
+                    
+                    
                 })
            }
             
@@ -85,7 +89,7 @@ struct ContentView: View {
             }
             
             print("Changed orientation")
-            if isReloadOnOrientationChange {
+            if isReloadOnOrientationChange && self.dataModel.isWorldMapPresent{
                 if let worldMapURL = dataModel.worldMapURL {
                     dataModel.loadARExperience(url: worldMapURL)
                 }

@@ -24,13 +24,15 @@ class ARDataModel:ObservableObject {
    @Published var enableAR:Bool=true
    @Published var snapshotImage:UIImage?=nil
    @Published var canSaveWorldMap:Bool = false
-    
-    private var wrappedSnapshotImage:UIImage?=nil{
+   @Published var isWorldMapPresent:Bool = false
+   
+   private var wrappedSnapshotImage:UIImage?=nil{
         didSet {
             if let image = wrappedSnapshotImage {
                 snapshotImage = image.resize(CGSize(width: 100,height: 200))
+                self.isWorldMapPresent=true
             } else {
-                
+                self.isWorldMapPresent=false
                 snapshotImage = nil
             }
         }
@@ -60,6 +62,8 @@ class ARDataModel:ObservableObject {
     
     func reloadARSession(){
         self.wrappedSnapshotImage=nil
+        
+        
         setupARConfiguration()
     }
     
@@ -135,6 +139,7 @@ extension ARDataModel {
             if let snapshotAnchor = worldMap.anchors.compactMap({ $0 as? ARSnapshotAnchor
             }).first {
                 self.wrappedSnapshotImage = UIImage(data: snapshotAnchor.snaphotImageData)
+                
             } else {
                 print("No snapshot available for this Experience")
             }

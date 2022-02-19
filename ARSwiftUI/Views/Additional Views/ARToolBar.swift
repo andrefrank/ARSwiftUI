@@ -13,6 +13,7 @@ struct ARToolBar:ToolbarContent {
     let loadAction:() -> Void
     let reloadAction:() -> Void
     let saveAction:() -> Void
+    let goToARSettings:() -> Void
     
     var body: some ToolbarContent {
         ToolbarItemGroup(placement:.bottomBar) {
@@ -50,6 +51,19 @@ struct ARToolBar:ToolbarContent {
                     .foregroundColor(enableSaveAction ? .white : .gray)
                 }.foregroundColor(Color(uiColor: .label))
                 .disabled(!enableSaveAction)
+            
+            
+            Spacer()
+            Button {
+              //Show/Edit Settings
+              goToARSettings()
+            } label: {
+                VStack {
+                    Image(systemName: "gear")
+                    Text("Settings")
+                }
+            }.foregroundColor(Color(uiColor: .label))
+            
         }
     }
 }
